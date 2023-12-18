@@ -208,7 +208,7 @@ void  BSP_LED_On (CPU_INT08U led)
 {
     switch (led) {
         case 0:
-             HAL_GPIO_WritePin(Led0_GPIO_Port, Led0_Pin,HIGH);
+             HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin,HIGH);
              //accendere tutti i led
              break;
         default:
@@ -242,7 +242,7 @@ void  BSP_LED_Off (CPU_INT08U led)
 {
     switch (led) {
         case 0:
-        	HAL_GPIO_WritePin(Led0_GPIO_Port, Led0_Pin, LOW);
+        	HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, LOW);
         	//spegnere tutti i led
              break;
 
@@ -291,7 +291,7 @@ void  BSP_LED_Toggle (CPU_INT08U led)
 
     switch (led) {
         case 0:
-            HAL_GPIO_TogglePin(Led0_GPIO_Port, Led0_Pin);
+            HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
             break;
 //        case 1:
 //        case 2:
