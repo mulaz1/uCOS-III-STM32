@@ -1,2 +1,5 @@
 [Dd]ebug/
 [Rr]elease/
+.settings/
+*.launch
+.*project*
