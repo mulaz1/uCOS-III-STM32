@@ -136,13 +136,13 @@ int main(void)
 
   OS_TCB OSTestTaskTcb;
   CPU_STK_SIZE OSCfg_TestStkBasePtr[128];
-  OS_ERR p_err;
+  OS_ERR p_err = OS_ERR_NONE;
 
   OS_TCB OSTest2TaskTcb;
   CPU_STK_SIZE OSCfg_Test2StkBasePtr[128];
-  OS_ERR p_err2;
+  OS_ERR p_err2 = OS_ERR_NONE;
 
-  OS_ERR err_rr_en;
+  OS_ERR err_rr_en = OS_ERR_NONE;
 
   OSSchedRoundRobinCfg(1,0,&err_rr_en);
   if(err_rr_en  != OS_ERR_NONE)
