@@ -1,33 +1,24 @@
 /*
-************************************************************************************************************************
-*                                                      uC/OS-III
-*                                                 The Real-Time Kernel
+*********************************************************************************************************
+*                                              uC/OS-III
+*                                        The Real-Time Kernel
 *
-*                                  (c) Copyright 2009-2015; Micrium, Inc.; Weston, FL
-*                           All rights reserved.  Protected by international copyright laws.
+*                    Copyright 2009-2022 Silicon Laboratories Inc. www.silabs.com
 *
-* File    : OS_TYPE.H
-* By      : JJL
-* Version : V3.04.05
+*                                 SPDX-License-Identifier: APACHE-2.0
 *
-* LICENSING TERMS:
-* ---------------
-*           uC/OS-III is provided in source form for FREE short-term evaluation, for educational use or 
-*           for peaceful research.  If you plan or intend to use uC/OS-III in a commercial application/
-*           product then, you need to contact Micrium to properly license uC/OS-III for its use in your 
-*           application/product.   We provide ALL the source code for your convenience and to help you 
-*           experience uC/OS-III.  The fact that the source is provided does NOT mean that you can use 
-*           it commercially without paying a licensing fee.
+*               This software is subject to an open source license and is distributed by
+*                Silicon Laboratories Inc. pursuant to the terms of the Apache License,
+*                    Version 2.0 available at www.apache.org/licenses/LICENSE-2.0.
 *
-*           Knowledge of the source code may NOT be used to develop a similar product.
-*
-*           Please help us continue to provide the embedded community with the finest software available.
-*           Your honesty is greatly appreciated.
-*
-*           You can find our product's user manual, API reference, release notes and
-*           more information at https://doc.micrium.com.
-*           You can contact us at www.micrium.com.
-************************************************************************************************************************
+*********************************************************************************************************
+*/
+
+/*
+*********************************************************************************************************
+* File    : os_type.h
+* Version : V3.08.02
+*********************************************************************************************************
 */
 
 #ifndef   OS_TYPE_H
@@ -70,7 +61,7 @@ typedef   CPU_INT08U      OS_NESTING_CTR;              /* Interrupt and schedule
 typedef   CPU_INT16U      OS_OBJ_QTY;                  /* Number of kernel objects counter,                   <16>/32 */
 typedef   CPU_INT32U      OS_OBJ_TYPE;                 /* Special flag to determine object type,                   32 */
 
-typedef   CPU_INT16U      OS_OPT;                      /* Holds function options                              <16>/32 */
+typedef   CPU_INT16U      OS_OPT;                      /* Holds function options,                             <16>/32 */
 
 typedef   CPU_INT08U      OS_PRIO;                     /* Priority of a task,                               <8>/16/32 */
 
@@ -78,7 +69,11 @@ typedef   CPU_INT16U      OS_QTY;                      /* Quantity              
 
 typedef   CPU_INT32U      OS_RATE_HZ;                  /* Rate in Hertz                                            32 */
 
-typedef   CPU_INT32U      OS_REG;                      /* Task register                                     8/16/<32> */
+#if (CPU_CFG_ADDR_SIZE == CPU_WORD_SIZE_64)            /* Task register                                  8/16/<32/64> */
+typedef   CPU_INT64U      OS_REG;
+#else
+typedef   CPU_INT32U      OS_REG;
+#endif
 typedef   CPU_INT08U      OS_REG_ID;                   /* Index to task register                            <8>/16/32 */
 
 typedef   CPU_INT32U      OS_SEM_CTR;                  /* Semaphore value                                     16/<32> */
