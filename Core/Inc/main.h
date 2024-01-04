@@ -31,13 +31,14 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "uCOS-III/Source/os.h"
+#include "uC-CPU/cpu_core.h"
 
-#include "includes.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-#include "core_cm4.h"
+HAL_StatusTypeDef COM_port_serial_print(const uint8_t* data);
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -54,10 +55,21 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define DISPL_DC_Pin GPIO_PIN_0
+#define DISPL_DC_GPIO_Port GPIOC
+#define TOUCH_MOSI_Pin GPIO_PIN_1
+#define TOUCH_MOSI_GPIO_Port GPIOC
+#define TOUCH_MISO_Pin GPIO_PIN_2
+#define TOUCH_MISO_GPIO_Port GPIOC
+#define TOUCH_INT_Pin GPIO_PIN_3
+#define TOUCH_INT_GPIO_Port GPIOC
+#define DISPL_SCK_Pin GPIO_PIN_5
+#define DISPL_SCK_GPIO_Port GPIOA
+#define TOUCH_SCK_Pin GPIO_PIN_10
+#define TOUCH_SCK_GPIO_Port GPIOB
 #define LED7_Pin GPIO_PIN_13
 #define LED7_GPIO_Port GPIOB
 #define LED6_Pin GPIO_PIN_14
