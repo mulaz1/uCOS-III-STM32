@@ -53,8 +53,9 @@ UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-HAL_StatusTypeDef COM_port_serial_print(const uint8_t *data) {
-	return HAL_UART_Transmit(&huart2, data, strlen((const char*) data) + 1, 100);
+
+HAL_StatusTypeDef COM_port_serial_print(const uint8_t* data) {
+    return HAL_UART_Transmit(&huart2, data, strlen((const char *)data) + 1, 100);
 }
 /* USER CODE END PV */
 
@@ -74,17 +75,17 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void OS_SetupTask(void *p_arg) {
+void  OS_SetupTask (void  *p_arg){
 
 	CPU_Init();
 	OS_ERR err;
 	SystemInit();
 	SystemCoreClockUpdate();
-	SysTick_Config(SystemCoreClock / 160);
-	SysTick->CTRL = 0;
-	SysTick->VAL = 0;
-	SysTick->CTRL = (SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk
-			| SysTick_CTRL_CLKSOURCE_Msk);
+
+	SysTick_Config(SystemCoreClock/160);
+	SysTick -> CTRL = 0;
+	SysTick -> VAL = 0;
+	SysTick -> CTRL = (SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_CLKSOURCE_Msk);
 
 	OS_TickInit(&err);
 
@@ -94,25 +95,28 @@ void OS_SetupTask(void *p_arg) {
 	return;
 }
 
-void OS_Test2Task(void *p_arg) {
+void OS_Test2Task(void *p_arg){
 	OS_ERR err;
-	while (1) {
+	while(1){
 
-		if (countTask2 > 2000000) {
+		if(countTask2 > 2000000){
 			LED0_GPIO_Port->BSRR = LED0_Pin;
-			if (countTask2 > 3000000)
-				countTask2 = 0;
-		} else {
+			if(countTask2 > 3000000) countTask2 = 0;
+		}
+		else{
 			LED0_GPIO_Port->BSRR = LED0_Pin << 16u;
 		}
-		countTask2++;
+		countTask2 ++;
+
+		HAL_GPIO_WritePin(LED7_GPIO_Port,LED7_Pin,1);
+
 	}
 }
 
-void OS_Test3Task(void *p_arg) {
+void OS_Test3Task(void *p_arg){
 	OS_ERR err;
 
-	while (1) {
+	while(1){
 		if(countTask3 > 1000000){
 			LED7_GPIO_Port->BSRR = LED7_Pin;
 			if(countTask3 > 2000000) countTask3 = 0;
@@ -122,6 +126,7 @@ void OS_Test3Task(void *p_arg) {
 		}
 		countTask3 ++;
 	}
+
 }
 /* USER CODE END 0 */
 
@@ -161,57 +166,76 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-	SysTick->CTRL = 0;
+  SysTick->CTRL  = 0;
 
-	__disable_irq();
-	CPU_IntDis(); /*disable interrupt*/
-	OSInit(&err);
+  __disable_irq();
+  CPU_IntDis(); 					/*disable interrupt*/
+  OSInit(&err);
 
-	if (err != OS_ERR_NONE) {
-		Error_Handler();
-	}
+  if(err != OS_ERR_NONE){
+	  Error_Handler();
+  }
 
-	//TEST BLOCK
 
-	OS_TCB OSSetupTaskTcb;
-	CPU_STK_SIZE OSCfg_SetupStkBasePtr[256];
-	OS_ERR p_err;
+  OS_TCB OSSetupTaskTcb;
+  CPU_STK_SIZE OSCfg_SetupStkBasePtr[256];
+  OS_ERR p_err;
 
-	OS_TCB OSTest2TaskTcb;
-	CPU_STK_SIZE OSCfg_Test2StkBasePtr[2048];
-	OS_ERR p_err2;
+  OS_TCB OSTest2TaskTcb;
+  CPU_STK_SIZE OSCfg_Test2StkBasePtr[2048];
+  OS_ERR p_err2;
 
-	OS_TCB OSTest3TaskTcb;
-	CPU_STK_SIZE OSCfg_Test3StkBasePtr[2048];
-	OS_ERR p_err3;
 
-	OS_ERR err_rr_en;
+  OS_TCB OSTest3TaskTcb;
+  CPU_STK_SIZE OSCfg_Test3StkBasePtr[2048];
+  OS_ERR p_err3;
 
-	OSSchedRoundRobinCfg(1, 0, &err_rr_en);
+  OS_ERR err_rr_en;
 
-	OSTaskCreate((OS_TCB*) &OSSetupTaskTcb,
-			(CPU_CHAR*) ((void*) "uC/OS-III Setup Task"),
-			(OS_TASK_PTR) OS_SetupTask, (void*) 0, (OS_PRIO) 8u,
-			(CPU_STK*) &OSCfg_SetupStkBasePtr[0], (CPU_STK_SIZE) 256u / 10,
-			(CPU_STK_SIZE) 256u, (OS_MSG_QTY) 0u, (OS_TICK) 0u, (void*) 0u,
-			(OS_OPT) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR ),
-			(OS_ERR*) p_err);
+  OSSchedRoundRobinCfg(1,0,&err_rr_en);
 
-	OSTaskCreate((OS_TCB*) &OSTest2TaskTcb,
-			(CPU_CHAR*) ((void*) "uC/OS-III Test 2 Task"),
-			(OS_TASK_PTR) OS_Test2Task, (void*) 0, (OS_PRIO) 10u,
-			(CPU_STK*) &OSCfg_Test2StkBasePtr[0], (CPU_STK_SIZE) 2048u / 10,
-			(CPU_STK_SIZE) 2048u, (OS_MSG_QTY) 0u, (OS_TICK) 0u, (void*) 0u,
-			(OS_OPT) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR ),
-			(OS_ERR*) p_err2);
+  OSTaskCreate((OS_TCB     *)&OSSetupTaskTcb,
+                     (CPU_CHAR   *)((void *)"uC/OS-III Setup Task"),
+                     (OS_TASK_PTR)OS_SetupTask,
+                     (void       *)0,
+                     (OS_PRIO     )8u,
+                     (CPU_STK    *)&OSCfg_SetupStkBasePtr[0],
+                     (CPU_STK_SIZE)256u / 10,
+                     (CPU_STK_SIZE)256u,
+                     (OS_MSG_QTY  )0u,
+                     (OS_TICK     )0u,
+                     (void       *)0u,
+                     (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
+                     (OS_ERR     *)p_err);
 
-	OSTaskCreate((OS_TCB*) &OSTest3TaskTcb,
-			(CPU_CHAR*) ((void*) "uC/OS-III Test 3 Task"),
-			(OS_TASK_PTR) OS_Test3Task, (void*) 0, (OS_PRIO) 10u,
-			(CPU_STK*) &OSCfg_Test3StkBasePtr[0], (CPU_STK_SIZE) 2048u / 10,
-			(CPU_STK_SIZE) 2048u, (OS_MSG_QTY) 0u, (OS_TICK) 0u, (void*) 0u,
-			(OS_OPT) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR ),
-			(OS_ERR*) p_err3);
+  OSTaskCreate((OS_TCB     *)&OSTest2TaskTcb,
+                       (CPU_CHAR   *)((void *)"uC/OS-III Test 2 Task"),
+                       (OS_TASK_PTR)OS_Test2Task,
+                       (void       *)0,
+                       (OS_PRIO     )10u,
+                       (CPU_STK    *)&OSCfg_Test2StkBasePtr[0],
+                       (CPU_STK_SIZE)2048u / 10,
+                       (CPU_STK_SIZE)2048u,
+                       (OS_MSG_QTY  )0u,
+                       (OS_TICK     )0u,
+                       (void       *)0u,
+                       (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
+                       (OS_ERR     *)p_err2);
+
+
+  OSTaskCreate((OS_TCB     *)&OSTest3TaskTcb,
+                         (CPU_CHAR   *)((void *)"uC/OS-III Test 3 Task"),
+                         (OS_TASK_PTR)OS_Test3Task,
+                         (void       *)0,
+                         (OS_PRIO     )10u,
+                         (CPU_STK    *)&OSCfg_Test3StkBasePtr[0],
+                         (CPU_STK_SIZE)2048u / 10,
+                         (CPU_STK_SIZE)2048u,
+                         (OS_MSG_QTY  )0u,
+                         (OS_TICK     )0u,
+                         (void       *)0u,
+                         (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
+                         (OS_ERR     *)p_err3);
 
 	OSStart(&err);
   /* USER CODE END 2 */
@@ -222,7 +246,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	}
+  }
   /* USER CODE END 3 */
 }
 
