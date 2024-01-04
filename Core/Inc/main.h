@@ -58,11 +58,18 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-<<<<<<< HEAD
-=======
-#define Led_test_Pin GPIO_PIN_5
-#define Led_test_GPIO_Port GPIOA
->>>>>>> stable_version
+#define DISPL_DC_Pin GPIO_PIN_0
+#define DISPL_DC_GPIO_Port GPIOC
+#define TOUCH_MOSI_Pin GPIO_PIN_1
+#define TOUCH_MOSI_GPIO_Port GPIOC
+#define TOUCH_MISO_Pin GPIO_PIN_2
+#define TOUCH_MISO_GPIO_Port GPIOC
+#define TOUCH_INT_Pin GPIO_PIN_3
+#define TOUCH_INT_GPIO_Port GPIOC
+#define DISPL_SCK_Pin GPIO_PIN_5
+#define DISPL_SCK_GPIO_Port GPIOA
+#define TOUCH_SCK_Pin GPIO_PIN_10
+#define TOUCH_SCK_GPIO_Port GPIOB
 #define LED7_Pin GPIO_PIN_13
 #define LED7_GPIO_Port GPIOB
 #define LED6_Pin GPIO_PIN_14
@@ -79,7 +86,6 @@ void Error_Handler(void);
 #define LED1_GPIO_Port GPIOC
 #define LED0_Pin GPIO_PIN_8
 #define LED0_GPIO_Port GPIOA
-<<<<<<< HEAD
 #define BTN3_Pin GPIO_PIN_9
 #define BTN3_GPIO_Port GPIOA
 #define BTN2_Pin GPIO_PIN_10
@@ -88,8 +94,6 @@ void Error_Handler(void);
 #define BTN1_GPIO_Port GPIOA
 #define BTN0_Pin GPIO_PIN_12
 #define BTN0_GPIO_Port GPIOA
-=======
->>>>>>> stable_version
 
 /* USER CODE BEGIN Private defines */
 

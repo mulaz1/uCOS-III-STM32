@@ -45,9 +45,6 @@ ADC_HandleTypeDef hadc1;
 
 I2C_HandleTypeDef hi2c1;
 
-RTC_HandleTypeDef hrtc;
-
-SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
 
 TIM_HandleTypeDef htim10;
@@ -69,29 +66,13 @@ static void MX_I2C1_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_TIM10_Init(void);
-<<<<<<< HEAD
-static void MX_RTC_Init(void);
-static void MX_SPI1_Init(void);
-=======
 static void MX_USART2_UART_Init(void);
->>>>>>> stable_version
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-<<<<<<< HEAD
-void  OS_TestTask (void  *p_arg){
-	while(1){
-	 HAL_GPIO_TogglePin(LED0_GPIO_Port,LED0_Pin);
-	}
-}
-
-void OS_Test2Task(void *p_arg){
-while(1){
-	 HAL_GPIO_TogglePin(LED0_GPIO_Port,LED0_Pin);
-=======
 void  OS_SetupTask (void  *p_arg){
 
 	CPU_Init();
@@ -126,11 +107,7 @@ void OS_Test2Task(void *p_arg){
 
 		HAL_GPIO_WritePin(LED7_GPIO_Port,LED7_Pin,1);
 
-		//HAL_GPIO_TogglePin(LED7_GPIO_Port,LED7_Pin);
-		//HAL_GPIO_WritePin(LED1_GPIO_Port,LED1_Pin,1);
 	}
-
->>>>>>> stable_version
 }
 
 void OS_Test3Task(void *p_arg){
@@ -183,12 +160,7 @@ int main(void)
   MX_SPI2_Init();
   MX_USART3_UART_Init();
   MX_TIM10_Init();
-<<<<<<< HEAD
-  MX_RTC_Init();
-  MX_SPI1_Init();
-=======
   MX_USART2_UART_Init();
->>>>>>> stable_version
   /* USER CODE BEGIN 2 */
 
   SysTick->CTRL  = 0;
@@ -203,17 +175,6 @@ int main(void)
 
   //TEST BLOCK
 
-<<<<<<< HEAD
-  OS_TCB OSTestTaskTcb;
-  CPU_STK_SIZE OSCfg_TestStkBasePtr[128];
-  OS_ERR p_err = OS_ERR_NONE;
-
-  OS_TCB OSTest2TaskTcb;
-  CPU_STK_SIZE OSCfg_Test2StkBasePtr[128];
-  OS_ERR p_err2 = OS_ERR_NONE;
-
-  OS_ERR err_rr_en = OS_ERR_NONE;
-=======
   OS_TCB OSSetupTaskTcb;
   CPU_STK_SIZE OSCfg_SetupStkBasePtr[256];
   OS_ERR p_err;
@@ -228,7 +189,6 @@ int main(void)
   OS_ERR p_err3;
 
   OS_ERR err_rr_en;
->>>>>>> stable_version
 
   OSSchedRoundRobinCfg(1,0,&err_rr_en);
 
@@ -306,14 +266,13 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSE;
-  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 50;
+  RCC_OscInitStruct.PLL.PLLN = 100;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
@@ -328,10 +287,10 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
   {
     Error_Handler();
   }
@@ -424,79 +383,6 @@ static void MX_I2C1_Init(void)
 }
 
 /**
-  * @brief RTC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_RTC_Init(void)
-{
-
-  /* USER CODE BEGIN RTC_Init 0 */
-
-  /* USER CODE END RTC_Init 0 */
-
-  /* USER CODE BEGIN RTC_Init 1 */
-
-  /* USER CODE END RTC_Init 1 */
-
-  /** Initialize RTC Only
-  */
-  hrtc.Instance = RTC;
-  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
-  hrtc.Init.AsynchPrediv = 127;
-  hrtc.Init.SynchPrediv = 255;
-  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
-  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
-  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
-  if (HAL_RTC_Init(&hrtc) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN RTC_Init 2 */
-
-  /* USER CODE END RTC_Init 2 */
-
-}
-
-/**
-  * @brief SPI1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPI1_Init(void)
-{
-
-  /* USER CODE BEGIN SPI1_Init 0 */
-
-  /* USER CODE END SPI1_Init 0 */
-
-  /* USER CODE BEGIN SPI1_Init 1 */
-
-  /* USER CODE END SPI1_Init 1 */
-  /* SPI1 parameter configuration*/
-  hspi1.Instance = SPI1;
-  hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPI1_Init 2 */
-
-  /* USER CODE END SPI1_Init 2 */
-
-}
-
-/**
   * @brief SPI2 Initialization Function
   * @param None
   * @retval None
@@ -550,7 +436,7 @@ static void MX_TIM10_Init(void)
 
   /* USER CODE END TIM10_Init 1 */
   htim10.Instance = TIM10;
-  htim10.Init.Prescaler = 0;
+  htim10.Init.Prescaler = 1;
   htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim10.Init.Period = 65535;
   htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -648,9 +534,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-<<<<<<< HEAD
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|LED4_Pin|LED3_Pin|LED2_Pin
-                          |LED1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, DISPL_DC_Pin|LED3_Pin|LED2_Pin|LED1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LED7_Pin|LED6_Pin|LED5_Pin, GPIO_PIN_RESET);
@@ -658,48 +542,27 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PC0 LED4_Pin LED3_Pin LED2_Pin
-                           LED1_Pin */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|LED4_Pin|LED3_Pin|LED2_Pin
-                          |LED1_Pin;
-=======
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|LED3_Pin|LED2_Pin|LED1_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, Led_test_Pin|LED0_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LED7_Pin|LED6_Pin|LED5_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pins : PC0 LED3_Pin LED2_Pin LED1_Pin */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|LED3_Pin|LED2_Pin|LED1_Pin;
->>>>>>> stable_version
+  /*Configure GPIO pins : DISPL_DC_Pin LED3_Pin LED2_Pin LED1_Pin */
+  GPIO_InitStruct.Pin = DISPL_DC_Pin|LED3_Pin|LED2_Pin|LED1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-<<<<<<< HEAD
-  /*Configure GPIO pin : PC3 */
-  GPIO_InitStruct.Pin = GPIO_PIN_3;
-=======
-  /*Configure GPIO pins : PC3 LED4_Pin */
-  GPIO_InitStruct.Pin = GPIO_PIN_3|LED4_Pin;
->>>>>>> stable_version
+  /*Configure GPIO pins : TOUCH_INT_Pin LED4_Pin */
+  GPIO_InitStruct.Pin = TOUCH_INT_Pin|LED4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-<<<<<<< HEAD
-=======
-  /*Configure GPIO pins : Led_test_Pin LED0_Pin */
-  GPIO_InitStruct.Pin = Led_test_Pin|LED0_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  /*Configure GPIO pin : DISPL_SCK_Pin */
+  GPIO_InitStruct.Pin = DISPL_SCK_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
+  HAL_GPIO_Init(DISPL_SCK_GPIO_Port, &GPIO_InitStruct);
 
->>>>>>> stable_version
   /*Configure GPIO pins : LED7_Pin LED6_Pin LED5_Pin */
   GPIO_InitStruct.Pin = LED7_Pin|LED6_Pin|LED5_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
