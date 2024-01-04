@@ -31,7 +31,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+extern OS_TCB* OSTCBCurPtr;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -72,7 +72,7 @@ void NMI_Handler(void)
 
   /* USER CODE END NonMaskableInt_IRQn 0 */
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
-  while (1)
+   while (1)
   {
   }
   /* USER CODE END NonMaskableInt_IRQn 1 */
@@ -84,11 +84,12 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
-
+	COM_port_serial_print("HardFault\r\n");
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
   {
     /* USER CODE BEGIN W1_HardFault_IRQn 0 */
+
     /* USER CODE END W1_HardFault_IRQn 0 */
   }
 }
@@ -164,6 +165,28 @@ void DebugMon_Handler(void)
   /* USER CODE END DebugMonitor_IRQn 1 */
 }
 
+<<<<<<< HEAD
+=======
+/**
+  * @brief This function handles Pendable request for system service.
+  */
+void PendSV_Handler(void)
+{
+  /* USER CODE BEGIN PendSV_IRQn 0 */
+  /* USER CODE END PendSV_IRQn 0 */
+  /* USER CODE BEGIN PendSV_IRQn 1 */
+	COM_port_serial_print("Entry PeneSV:");
+	COM_port_serial_print(OSTCBCurPtr->NamePtr);
+	COM_port_serial_print("\r\n");
+	OS_CPU_PendSVHandler();
+	COM_port_serial_print("Exit PeneSV: ");
+	COM_port_serial_print(OSTCBCurPtr->NamePtr);
+	COM_port_serial_print("\r\n");
+
+  /* USER CODE END PendSV_IRQn 1 */
+}
+
+>>>>>>> stable_version
 /**
   * @brief This function handles System tick timer.
   */
@@ -174,7 +197,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-
+  OS_CPU_SysTickHandler();
   /* USER CODE END SysTick_IRQn 1 */
 }
 

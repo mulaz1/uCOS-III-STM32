@@ -31,13 +31,14 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "uCOS-III/Source/os.h"
+#include "uC-CPU/cpu_core.h"
 
-#include "includes.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-#include "core_cm4.h"
+HAL_StatusTypeDef COM_port_serial_print(const uint8_t* data);
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -54,10 +55,14 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+<<<<<<< HEAD
+=======
+#define Led_test_Pin GPIO_PIN_5
+#define Led_test_GPIO_Port GPIOA
+>>>>>>> stable_version
 #define LED7_Pin GPIO_PIN_13
 #define LED7_GPIO_Port GPIOB
 #define LED6_Pin GPIO_PIN_14
@@ -74,6 +79,7 @@ void Error_Handler(void);
 #define LED1_GPIO_Port GPIOC
 #define LED0_Pin GPIO_PIN_8
 #define LED0_GPIO_Port GPIOA
+<<<<<<< HEAD
 #define BTN3_Pin GPIO_PIN_9
 #define BTN3_GPIO_Port GPIOA
 #define BTN2_Pin GPIO_PIN_10
@@ -82,6 +88,8 @@ void Error_Handler(void);
 #define BTN1_GPIO_Port GPIOA
 #define BTN0_Pin GPIO_PIN_12
 #define BTN0_GPIO_Port GPIOA
+=======
+>>>>>>> stable_version
 
 /* USER CODE BEGIN Private defines */
 
