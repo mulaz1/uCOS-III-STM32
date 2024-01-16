@@ -11,3 +11,6 @@
 - Now do the same thing under Assembly section
 
 Now the work is done and you can build the project without errors.
+
+
+In order to use ```COM_port_serial_print()``` function, you need to use PuTTY (or another serial terminal emulator) and open a serial connection 115200 8E1 on the right COM port that you can see on Device Manager (if you are on Windows) in the section Ports (COM & LPT).
