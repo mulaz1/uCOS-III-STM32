@@ -84,7 +84,7 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
-	COM_port_serial_print("HardFault\r\n");
+	COM_port_serial_print((const uint8_t *)"HardFault\r\n");
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
   {
@@ -173,13 +173,13 @@ void PendSV_Handler(void)
   /* USER CODE BEGIN PendSV_IRQn 0 */
   /* USER CODE END PendSV_IRQn 0 */
   /* USER CODE BEGIN PendSV_IRQn 1 */
-	COM_port_serial_print("Entry PeneSV:");
-	COM_port_serial_print(OSTCBCurPtr->NamePtr);
-	COM_port_serial_print("\r\n");
+	COM_port_serial_print((const uint8_t *)"Entry PeneSV:");
+	COM_port_serial_print((const uint8_t *)OSTCBCurPtr->NamePtr);
+	COM_port_serial_print((const uint8_t *)"\r\n");
 	OS_CPU_PendSVHandler();
-	COM_port_serial_print("Exit PeneSV: ");
-	COM_port_serial_print(OSTCBCurPtr->NamePtr);
-	COM_port_serial_print("\r\n");
+	COM_port_serial_print((const uint8_t *)"Exit PeneSV: ");
+	COM_port_serial_print((const uint8_t *)OSTCBCurPtr->NamePtr);
+	COM_port_serial_print((const uint8_t *)"\r\n");
 
   /* USER CODE END PendSV_IRQn 1 */
 }
@@ -194,6 +194,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
+  /* FIXME why when commenting HAL_IncTick() we get to an HardFault */
   OS_CPU_SysTickHandler();
   /* USER CODE END SysTick_IRQn 1 */
 }
