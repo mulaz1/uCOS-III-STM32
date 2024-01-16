@@ -76,11 +76,18 @@ static void MX_SPI1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+OS_TCB OSSetupTaskTcb;
+OS_TCB OSTest2TaskTcb;
+OS_TCB OSTest3TaskTcb;
+
+CPU_STK_SIZE OSCfg_SetupStkBasePtr[256];
+CPU_STK_SIZE OSCfg_Test2StkBasePtr[2048];
+CPU_STK_SIZE OSCfg_Test3StkBasePtr[2048];
 
 void  OS_SetupTask (void  *p_arg){
 
 	CPU_Init();
-	OS_ERR err;
+//	OS_ERR err = OS_ERR_NONE;
 	SystemInit();
 	SystemCoreClockUpdate();
 
@@ -89,16 +96,17 @@ void  OS_SetupTask (void  *p_arg){
 	SysTick -> VAL = 0;
 	SysTick -> CTRL = (SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_CLKSOURCE_Msk);
 
-	OS_TickInit(&err);
+//	OS_TickInit(&err);	/* This function must not be called explicitly. In addition, it is already called by OSInit() */
 
 	OS_CPU_SysTickInitFreq(SystemCoreClock);
 
-	COM_port_serial_print("START_TASK\r\n");
+	COM_port_serial_print((const uint8_t*)"START_TASK\r\n");
 	return;
 }
 
 void OS_Test2Task(void *p_arg){
-	OS_ERR err;
+//	OS_ERR err = OS_ERR_NONE;
+
 	while(1){
 
 		if(countTask2 > 2000000){
@@ -118,7 +126,7 @@ void OS_Test2Task(void *p_arg){
 }
 
 void OS_Test3Task(void *p_arg){
-	OS_ERR err;
+//	OS_ERR err = OS_ERR_NONE;
 
 	while(1){
 		if(countTask3 > 1000000){
@@ -143,7 +151,7 @@ void OS_Test3Task(void *p_arg){
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	OS_ERR err;
+	OS_ERR err = OS_ERR_NONE;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -185,21 +193,13 @@ int main(void)
 	  Error_Handler();
   }
 
+  OS_ERR p_err = OS_ERR_NONE;
 
-  OS_TCB OSSetupTaskTcb;
-  CPU_STK_SIZE OSCfg_SetupStkBasePtr[256];
-  OS_ERR p_err;
+  OS_ERR p_err2 = OS_ERR_NONE;
 
-  OS_TCB OSTest2TaskTcb;
-  CPU_STK_SIZE OSCfg_Test2StkBasePtr[2048];
-  OS_ERR p_err2;
+  OS_ERR p_err3 = OS_ERR_NONE;
 
-
-  OS_TCB OSTest3TaskTcb;
-  CPU_STK_SIZE OSCfg_Test3StkBasePtr[2048];
-  OS_ERR p_err3;
-
-  OS_ERR err_rr_en;
+  OS_ERR err_rr_en = OS_ERR_NONE;
 
   OSSchedRoundRobinCfg(1,0,&err_rr_en);
 
