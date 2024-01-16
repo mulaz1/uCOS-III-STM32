@@ -74,6 +74,13 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+OS_TCB OSSetupTaskTcb;
+OS_TCB OSTest2TaskTcb;
+OS_TCB OSTest3TaskTcb;
+
+CPU_STK_SIZE OSCfg_SetupStkBasePtr[256];
+CPU_STK_SIZE OSCfg_Test2StkBasePtr[2048];
+CPU_STK_SIZE OSCfg_Test3StkBasePtr[2048];
 
 void  OS_SetupTask (void  *p_arg){
 
@@ -177,17 +184,10 @@ int main(void)
 	  Error_Handler();
   }
 
-  OS_TCB OSSetupTaskTcb;
-  CPU_STK_SIZE OSCfg_SetupStkBasePtr[256];
   OS_ERR p_err = OS_ERR_NONE;
 
-  OS_TCB OSTest2TaskTcb;
-  CPU_STK_SIZE OSCfg_Test2StkBasePtr[2048];
   OS_ERR p_err2 = OS_ERR_NONE;
 
-
-  OS_TCB OSTest3TaskTcb;
-  CPU_STK_SIZE OSCfg_Test3StkBasePtr[2048];
   OS_ERR p_err3 = OS_ERR_NONE;
 
   OS_ERR err_rr_en = OS_ERR_NONE;
