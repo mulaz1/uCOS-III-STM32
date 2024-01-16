@@ -85,7 +85,7 @@ CPU_STK_SIZE OSCfg_Test3StkBasePtr[2048];
 void  OS_SetupTask (void  *p_arg){
 
 	CPU_Init();
-	OS_ERR err = OS_ERR_NONE;
+//	OS_ERR err = OS_ERR_NONE;
 	SystemInit();
 	SystemCoreClockUpdate();
 
@@ -94,7 +94,7 @@ void  OS_SetupTask (void  *p_arg){
 	SysTick -> VAL = 0;
 	SysTick -> CTRL = (SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_CLKSOURCE_Msk);
 
-	OS_TickInit(&err);
+//	OS_TickInit(&err);	/* This function must not be called explicitly. In addition, it is already called by OSInit() */
 
 	OS_CPU_SysTickInitFreq(SystemCoreClock);
 
