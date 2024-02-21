@@ -101,6 +101,15 @@ void  OS_SetupTask (void  *p_arg){
 	OS_CPU_SysTickInitFreq(SystemCoreClock);
 
 	COM_port_serial_print((const uint8_t*)"START_TASK\r\n");
+
+
+	//init buttons and leds
+
+	BSP_PB_Init(1,BTN0_GPIO_Port,BTN0_Pin);
+	BSP_PB_Init(1,BTN1_GPIO_Port,BTN1_Pin);
+	BSP_PB_Init(1,BTN2_GPIO_Port,BTN2_Pin);
+	BSP_PB_Init(1,BTN3_GPIO_Port,BTN3_Pin);
+
 	return;
 }
 
@@ -595,10 +604,8 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : TOUCH_CS_Pin DISPL_DC_Pin DISPL_CS_Pin LED4_Pin
-                           LED3_Pin LED2_Pin LED1_Pin */
-  GPIO_InitStruct.Pin = TOUCH_CS_Pin|DISPL_DC_Pin|DISPL_CS_Pin|LED4_Pin
-                          |LED3_Pin|LED2_Pin|LED1_Pin;
+  /*Configure GPIO pins : TOUCH_CS_Pin DISPL_DC_Pin DISPL_CS_Pin */
+  GPIO_InitStruct.Pin = TOUCH_CS_Pin|DISPL_DC_Pin|DISPL_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -610,25 +617,45 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(TOUCH_INT_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : DISPL_RST_Pin LED7_Pin LED6_Pin LED5_Pin */
-  GPIO_InitStruct.Pin = DISPL_RST_Pin|LED7_Pin|LED6_Pin|LED5_Pin;
+  /*Configure GPIO pin : DISPL_RST_Pin */
+  GPIO_InitStruct.Pin = DISPL_RST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(DISPL_RST_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LED7_Pin LED6_Pin LED5_Pin */
+  GPIO_InitStruct.Pin = LED7_Pin|LED6_Pin|LED5_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LED4_Pin LED3_Pin LED2_Pin LED1_Pin */
+  GPIO_InitStruct.Pin = LED4_Pin|LED3_Pin|LED2_Pin|LED1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LED0_Pin */
   GPIO_InitStruct.Pin = LED0_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED0_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BTN3_Pin BTN2_Pin BTN1_Pin BTN0_Pin */
-  GPIO_InitStruct.Pin = BTN3_Pin|BTN2_Pin|BTN1_Pin|BTN0_Pin;
+  /*Configure GPIO pins : BTN3_Pin BTN2_Pin BTN1_Pin */
+  GPIO_InitStruct.Pin = BTN3_Pin|BTN2_Pin|BTN1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : BTN0_Pin */
+  GPIO_InitStruct.Pin = BTN0_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(BTN0_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
@@ -637,11 +664,36 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  //se premo il pulsante:
+	//che il pin premuto sia valido
+	//faccio qualcosa
+	//tipo bestemmiare
+
+	if (GPIO_Pin==TOUCH_INT_Pin){
+		Touch_HandlePenDownInterrupt();
+	}
+	else{
+		BSP_BTN_Callback(GPIO_Pin);
+	}
+}
+
+//void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
+//	HAL_GPIO_EXTI_Callback(GPIO_Pin);
+//}
+//
+//void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
+//	HAL_GPIO_EXTI_Callback(GPIO_Pin);
+//}
 
 /* USER CODE END 4 */
 

@@ -5,6 +5,8 @@
  *      Author: OSES-Group
  */
 
+#include "main.h"
+
 #ifndef INC_XPT2046_H_
 #define INC_XPT2046_H_
 
@@ -70,6 +72,7 @@
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+void Touch_HandlePenDownInterrupt();
 
 uint8_t Touch_In_XY_area(uint16_t xpos,uint16_t ypos,uint16_t width,uint16_t height);
 uint8_t Touch_GotATouch(uint8_t reset);

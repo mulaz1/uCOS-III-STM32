@@ -1,12 +1,6 @@
-/*
- * XPT2046.h
- *
- *  Created on: Jan 2, 2024
- *      Author: OSES-Group
- */
 
+#include "../Inc/XPT2046.h"
 
-#include "main.h"
 
 extern SPI_HandleTypeDef TOUCH_SPI_PORT;
 volatile extern uint8_t Displ_SpiAvailable;  			// 0 if SPI is busy or 1 if it is free (transm cplt)
@@ -24,27 +18,6 @@ void Touch_HandlePenDownInterrupt (){
 	}
 }
 
-
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	if (GPIO_Pin==TOUCH_INT_Pin){
-		Touch_HandlePenDownInterrupt();
-	}
-}
-
-
-
-void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
-	HAL_GPIO_EXTI_Callback(GPIO_Pin);
-}
-
-void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
-	HAL_GPIO_EXTI_Callback(GPIO_Pin);
-}
-
-
-
-
 /******************************************
  * @brief	enable touch, disabling display
  * 			set SPI baudrate as needed
@@ -60,8 +33,6 @@ void Touch_Select(void) {
 	}
 }
 
-
-
 /******************************************
  * @brief	disable touch
  ******************************************/
@@ -70,10 +41,6 @@ void Touch_UnSelect(void) {
 		HAL_GPIO_WritePin(TOUCH_CS_GPIO_Port, TOUCH_CS_Pin, GPIO_PIN_SET);			// unselect touch
 	}
 }
-
-
-
-
 
 /*******************************************************************************
  * @brief			Poll display for the current level of X, Y, or Z
@@ -92,7 +59,7 @@ uint16_t Touch_PollAxis(uint8_t axis) {
 
 	Touch_Int_Enabled=0;	//disable interrupt handling: sensor reading triggers interrupt
 	// disable interrupt while enquiring the touch sensor because it triggers the interrupt pin
-	HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+	HAL_NVIC_DisableIRQ(EXTI3_IRQn);
 
 	HAL_SPI_Transmit(&TOUCH_SPI_PORT, &axis, 1, 10);
 	if (HAL_SPI_Receive(&TOUCH_SPI_PORT, poll, 2, 10) == HAL_OK) {
@@ -103,8 +70,8 @@ uint16_t Touch_PollAxis(uint8_t axis) {
 	}
 
 //enable back interrupt after reading the sensor
-	HAL_NVIC_ClearPendingIRQ(EXTI9_5_IRQn);
-	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+	HAL_NVIC_ClearPendingIRQ(EXTI3_IRQn);
+	HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 
 	Touch_Int_Enabled=1;
 
@@ -114,10 +81,6 @@ uint16_t Touch_PollAxis(uint8_t axis) {
 
 	return poll16;
 }
-
-
-
-
 
 /*********************************************************************************
  * @brief			polls touch screen just on Z axis returning if

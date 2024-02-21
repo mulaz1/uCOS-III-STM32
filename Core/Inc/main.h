@@ -40,6 +40,10 @@ extern "C" {
 #include "uC-BSP/Display/Inc/XPT2046_test.h"
 #include "uC-BSP/Display/Inc/XPT2046_menu.h"
 
+
+//LEDs and BUTTONs
+#include "uC-BSP/Button/Inc/button.h"
+#include "uC-BSP/Led/Inc/led.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -108,10 +112,13 @@ void Error_Handler(void);
 #define BTN3_EXTI_IRQn EXTI9_5_IRQn
 #define BTN2_Pin GPIO_PIN_10
 #define BTN2_GPIO_Port GPIOA
+#define BTN2_EXTI_IRQn EXTI15_10_IRQn
 #define BTN1_Pin GPIO_PIN_11
 #define BTN1_GPIO_Port GPIOA
+#define BTN1_EXTI_IRQn EXTI15_10_IRQn
 #define BTN0_Pin GPIO_PIN_12
 #define BTN0_GPIO_Port GPIOA
+#define BTN0_EXTI_IRQn EXTI15_10_IRQn
 
 /* USER CODE BEGIN Private defines */
 
