@@ -14,7 +14,7 @@
 #define DISPL_PRESCALER SPI_BAUDRATEPRESCALER_2
 #define TOUCH_PRESCALER SPI_BAUDRATEPRESCALER_2
 #define DISPLAY_SPI_POLLING_MODE
-#define BUFLEVEL 13
+#define BUFLEVEL 12
 
 #ifdef ILI9341
 #define Z_RGB565
@@ -99,7 +99,7 @@ typedef enum {
 
 // da rivedere
 #ifndef DISPLAY_USING_TOUCHGFX
-void Displ_drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
+_Bool Displ_drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
 void Displ_fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
 
 void Displ_fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color);
@@ -110,7 +110,6 @@ void Displ_CLS(uint16_t bgcolor);
 void Displ_CString(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, const char* str, sFONT font, uint8_t size, uint16_t color, uint16_t bgcolor);
 void Displ_fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
 void Displ_drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
-void Displ_Init(Displ_Orientat_e orientation);
 void Displ_Line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
 void Displ_FillArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
 void Displ_Orientation(Displ_Orientat_e orientation);

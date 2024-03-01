@@ -40,6 +40,7 @@ uint8_t countTask2 = 0;
 unsigned int countTask3 = 0;
 uint16_t antibalancing = 0;
 uint16_t color[6] = {0x001F,0x07E0,0xFD00,0xC018,0x8000,0x0010};
+uint16_t i = 0;
 //color test
 
 /* USER CODE END PM */
@@ -49,6 +50,7 @@ I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
+DMA_HandleTypeDef hdma_spi1_tx;
 
 TIM_HandleTypeDef htim10;
 
@@ -65,6 +67,7 @@ HAL_StatusTypeDef COM_port_serial_print(const uint8_t* data) {
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_USART3_UART_Init(void);
@@ -113,7 +116,7 @@ void  OS_SetupTask (void  *p_arg){
 
 	//init display
 	Displ_Init(Displ_Orientat_0);
-	Displ_CLS(BLACK);
+	Displ_CLS(WHITE);
 	//init Leds
 	Led_Init();
 	return;
@@ -153,16 +156,17 @@ void OS_Test2Task(void *p_arg) {
 
 void OS_Test3Task(void *p_arg){
 //	OS_ERR err = OS_ERR_NONE;
-static int i = 0;
+
+	static int x0 = 100;
+	static int y0 = 100;
 	while(1){
 
-		//Displ_CLS(color[i]);
-		if(i < 6) i++;
-		else i = 0;
-
+		if(Displ_drawCircle(x0,y0, 100, RED) == 0){
+			x0 += 1;
+			y0 += 1;
 		}
-
 	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -193,6 +197,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   MX_SPI2_Init();
   MX_USART3_UART_Init();
@@ -381,7 +386,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -532,6 +537,22 @@ static void MX_USART3_UART_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -556,10 +577,10 @@ static void MX_GPIO_Init(void)
                           |LED2_Pin|LED1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4|LED0_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, DISPL_RST_Pin|LED7_Pin|LED5_Pin|LED4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, DISPL_RST_Pin|LED7_Pin|LED5_Pin|LED4_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : TOUCH_CS_Pin DISPL_DC_Pin DISPL_CS_Pin */
   GPIO_InitStruct.Pin = TOUCH_CS_Pin|DISPL_DC_Pin|DISPL_CS_Pin;
@@ -573,13 +594,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(TOUCH_INT_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PA4 */
-  GPIO_InitStruct.Pin = GPIO_PIN_4;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : DISPL_RST_Pin */
   GPIO_InitStruct.Pin = DISPL_RST_Pin;
