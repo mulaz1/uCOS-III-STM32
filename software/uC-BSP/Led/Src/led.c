@@ -1,6 +1,7 @@
 #include "../Inc/led.h"
+#include "main.h"
 
-void BSP_LED_Init(void) {
+void Led_Init(void) {
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
 	/*Configure GPIO pins : LED7_Pin LED6_Pin LED5_Pin */
@@ -26,41 +27,41 @@ void BSP_LED_Init(void) {
 
 	HAL_GPIO_Init(LED0_GPIO_Port, &GPIO_InitStruct);
 
-	HAL_GPIO_WritePin(LED7_GPIO_Port, LED7_Pin, LOW);
-	HAL_GPIO_WritePin(LED6_GPIO_Port, LED6_Pin, LOW);
-	HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, LOW);
-	HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, LOW);
-	HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, LOW);
-	HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, LOW);
-	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, LOW);
-	HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, LOW);
+	HAL_GPIO_WritePin(LED7_GPIO_Port, LED7_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED6_GPIO_Port, LED6_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
 }
 
 static void BSP_LED_On(unsigned int led) {
 	switch (led) {
 	case 0:
-		HAL_GPIO_WritePin(GPIOC, LED0_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
 		break;
 	case 1:
-		HAL_GPIO_WritePin(GPIOC, LED1_Pin, HIGH);
+		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 		break;
 	case 2:
-		HAL_GPIO_WritePin(GPIOC, LED2_Pin, HIGH);
+		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
 		break;
 	case 3:
-		HAL_GPIO_WritePin(GPIOC, LED3_Pin, HIGH);
+		HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_SET);
 		break;
 	case 4:
-		HAL_GPIO_WritePin(GPIOC, LED4_Pin, HIGH);
+		HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, GPIO_PIN_SET);
 		break;
 	case 5:
-		HAL_GPIO_WritePin(GPIOB, LED5_Pin, HIGH);
+		HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_SET);
 		break;
 	case 6:
-		HAL_GPIO_WritePin(GPIOB, LED6_Pin, HIGH);
+		HAL_GPIO_WritePin(LED6_GPIO_Port, LED6_Pin, GPIO_PIN_SET);
 		break;
 	case 7:
-		HAL_GPIO_WritePin(GPIOB, LED7_Pin, HIGH);
+		HAL_GPIO_WritePin(LED7_GPIO_Port, LED7_Pin, GPIO_PIN_SET);
 		break;
 	default:
 		break;
@@ -73,25 +74,25 @@ static void BSP_LED_Off(unsigned int led) {
 		HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
 		break;
 	case 1:
-		HAL_GPIO_WritePin(GPIOC, LED1_Pin, LOW);
+		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
 		break;
 	case 2:
-		HAL_GPIO_WritePin(GPIOC, LED2_Pin, LOW);
+		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
 		break;
 	case 3:
-		HAL_GPIO_WritePin(GPIOC, LED3_Pin, LOW);
+		HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET);
 		break;
 	case 4:
-		HAL_GPIO_WritePin(GPIOC, LED4_Pin, LOW);
+		HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, GPIO_PIN_RESET);
 		break;
 	case 5:
-		HAL_GPIO_WritePin(GPIOB, LED5_Pin, LOW);
+		HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_RESET);
 		break;
 	case 6:
-		HAL_GPIO_WritePin(GPIOB, LED6_Pin, LOW);
+		HAL_GPIO_WritePin(LED6_GPIO_Port, LED6_Pin, GPIO_PIN_RESET);
 		break;
 	case 7:
-		HAL_GPIO_WritePin(GPIOB, LED7_Pin, LOW);
+		HAL_GPIO_WritePin(LED7_GPIO_Port, LED7_Pin, GPIO_PIN_RESET);
 		break;
 	default:
 		break;

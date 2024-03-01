@@ -31,18 +31,20 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define BALANCING_DELAY 50000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-unsigned int countTask2 = 0;
+uint8_t countTask2 = 0;
 unsigned int countTask3 = 0;
+uint16_t antibalancing = 0;
+uint16_t color[6] = {0x001F,0x07E0,0xFD00,0xC018,0x8000,0x0010};
+//color test
 
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef hadc1;
-
 I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
@@ -63,7 +65,6 @@ HAL_StatusTypeDef COM_port_serial_print(const uint8_t* data) {
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_ADC1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_USART3_UART_Init(void);
@@ -80,14 +81,14 @@ OS_TCB OSSetupTaskTcb;
 OS_TCB OSTest2TaskTcb;
 OS_TCB OSTest3TaskTcb;
 
-CPU_STK_SIZE OSCfg_SetupStkBasePtr[256];
+CPU_STK_SIZE OSCfg_SetupStkBasePtr[512];
 CPU_STK_SIZE OSCfg_Test2StkBasePtr[2048];
 CPU_STK_SIZE OSCfg_Test3StkBasePtr[2048];
 
 void  OS_SetupTask (void  *p_arg){
 
 	CPU_Init();
-//	OS_ERR err = OS_ERR_NONE;
+	OS_ERR err = OS_ERR_NONE;
 	SystemInit();
 	SystemCoreClockUpdate();
 
@@ -105,29 +106,45 @@ void  OS_SetupTask (void  *p_arg){
 
 	//init buttons and leds
 
-	BSP_PB_Init(1,BTN0_GPIO_Port,BTN0_Pin);
-	BSP_PB_Init(1,BTN1_GPIO_Port,BTN1_Pin);
-	BSP_PB_Init(1,BTN2_GPIO_Port,BTN2_Pin);
-	BSP_PB_Init(1,BTN3_GPIO_Port,BTN3_Pin);
+	Btn_Init(BTN0_GPIO_Port,BTN0_Pin,BUTTON_MODE_POL);
+	Btn_Init(BTN1_GPIO_Port,BTN1_Pin,BUTTON_MODE_POL);
+	Btn_Init(BTN2_GPIO_Port,BTN2_Pin,BUTTON_MODE_POL);
+	Btn_Init(BTN3_GPIO_Port,BTN3_Pin,BUTTON_MODE_POL);
 
+	//init display
+	Displ_Init(Displ_Orientat_0);
+	Displ_CLS(BLACK);
+	//init Leds
+	Led_Init();
 	return;
+	//OSTaskSuspend((OS_TCB *)0,&err);
+	//OSTaskDel((OS_TCB *)0,&err);
 }
 
-void OS_Test2Task(void *p_arg){
+void OS_Test2Task(void *p_arg) {
 //	OS_ERR err = OS_ERR_NONE;
 
-	while(1){
+	while (1) {
 
-		if(countTask2 > 2000000){
+		if (Btn_getState(BTN3_GPIO_Port, BTN3_Pin) == GPIO_PIN_SET) {
+			antibalancing++;
+			if (antibalancing >= BALANCING_DELAY) {
+				countTask2 = (countTask2 * 2) + 1;
+				ledOut(countTask2);
+				antibalancing = 0;
+			}
+		}
 
-			LED0_GPIO_Port->BSRR = LED0_Pin;
-			if(countTask2 > 3000000) countTask2 = 0;
+		if (Btn_getState(BTN0_GPIO_Port, BTN0_Pin) == GPIO_PIN_SET) {
+			antibalancing++;
+
+			if (antibalancing >= BALANCING_DELAY) {
+				countTask2 = (countTask2 / 2);
+				ledOut(countTask2);
+				antibalancing = 0;
+			}
 		}
-		else{
-			LED0_GPIO_Port->BSRR = LED0_Pin << 16u;
-		}
-		countTask2 ++;
-		//HAL_GPIO_WritePin(LED7_GPIO_Port,LED7_Pin,1);
+
 		//Displ_PerfTest();
 		//Touch_ShowData();
 		//Touch_TestDrawing();
@@ -136,21 +153,16 @@ void OS_Test2Task(void *p_arg){
 
 void OS_Test3Task(void *p_arg){
 //	OS_ERR err = OS_ERR_NONE;
-
+static int i = 0;
 	while(1){
-		if(countTask3 > 1000000){
-			LED7_GPIO_Port->BSRR = LED7_Pin;
-			if(countTask3 > 2000000) countTask3 = 0;
-		}
-		else{
-			LED7_GPIO_Port->BSRR = LED7_Pin << 16u;
-		}
-		countTask3 ++;
 
+		//Displ_CLS(color[i]);
+		if(i < 6) i++;
+		else i = 0;
+
+		}
 
 	}
-
-}
 /* USER CODE END 0 */
 
 /**
@@ -181,7 +193,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC1_Init();
   MX_I2C1_Init();
   MX_SPI2_Init();
   MX_USART3_UART_Init();
@@ -189,8 +200,6 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  Displ_Init(Displ_Orientat_0);
-  Displ_CLS(BLACK);
 
   SysTick->CTRL  = 0;
 
@@ -218,8 +227,8 @@ int main(void)
                      (void       *)0,
                      (OS_PRIO     )8u,
                      (CPU_STK    *)&OSCfg_SetupStkBasePtr[0],
-                     (CPU_STK_SIZE)256u / 10,
-                     (CPU_STK_SIZE)256u,
+                     (CPU_STK_SIZE)512u / 10,
+                     (CPU_STK_SIZE)512u,
                      (OS_MSG_QTY  )0u,
                      (OS_TICK     )0u,
                      (void       *)0u,
@@ -313,58 +322,6 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-}
-
-/**
-  * @brief ADC1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_ADC1_Init(void)
-{
-
-  /* USER CODE BEGIN ADC1_Init 0 */
-
-  /* USER CODE END ADC1_Init 0 */
-
-  ADC_ChannelConfTypeDef sConfig = {0};
-
-  /* USER CODE BEGIN ADC1_Init 1 */
-
-  /* USER CODE END ADC1_Init 1 */
-
-  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-  */
-  hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
-  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
-  hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
-  hadc1.Init.DMAContinuousRequests = DISABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-  if (HAL_ADC_Init(&hadc1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_4;
-  sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN ADC1_Init 2 */
-
-  /* USER CODE END ADC1_Init 2 */
-
 }
 
 /**
@@ -595,14 +552,14 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(TOUCH_CS_GPIO_Port, TOUCH_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, DISPL_DC_Pin|DISPL_CS_Pin|LED4_Pin|LED3_Pin
+  HAL_GPIO_WritePin(GPIOC, DISPL_DC_Pin|DISPL_CS_Pin|LED3_Pin|LED6_Pin
                           |LED2_Pin|LED1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, DISPL_RST_Pin|LED7_Pin|LED6_Pin|LED5_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4|LED0_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, DISPL_RST_Pin|LED7_Pin|LED5_Pin|LED4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : TOUCH_CS_Pin DISPL_DC_Pin DISPL_CS_Pin */
   GPIO_InitStruct.Pin = TOUCH_CS_Pin|DISPL_DC_Pin|DISPL_CS_Pin;
@@ -617,6 +574,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(TOUCH_INT_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : PA4 */
+  GPIO_InitStruct.Pin = GPIO_PIN_4;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
   /*Configure GPIO pin : DISPL_RST_Pin */
   GPIO_InitStruct.Pin = DISPL_RST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -624,15 +588,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(DISPL_RST_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LED7_Pin LED6_Pin LED5_Pin */
-  GPIO_InitStruct.Pin = LED7_Pin|LED6_Pin|LED5_Pin;
+  /*Configure GPIO pins : LED7_Pin LED5_Pin LED4_Pin */
+  GPIO_InitStruct.Pin = LED7_Pin|LED5_Pin|LED4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LED4_Pin LED3_Pin LED2_Pin LED1_Pin */
-  GPIO_InitStruct.Pin = LED4_Pin|LED3_Pin|LED2_Pin|LED1_Pin;
+  /*Configure GPIO pins : LED3_Pin LED6_Pin LED2_Pin LED1_Pin */
+  GPIO_InitStruct.Pin = LED3_Pin|LED6_Pin|LED2_Pin|LED1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -648,7 +612,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : BTN3_Pin BTN2_Pin BTN1_Pin */
   GPIO_InitStruct.Pin = BTN3_Pin|BTN2_Pin|BTN1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : BTN0_Pin */
@@ -658,13 +622,13 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(BTN0_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI3_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
@@ -679,11 +643,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	//faccio qualcosa
 	//tipo bestemmiare
 
-	if (GPIO_Pin==TOUCH_INT_Pin){
+	if (GPIO_Pin == TOUCH_INT_Pin){
 		Touch_HandlePenDownInterrupt();
 	}
 	else{
-		BSP_BTN_Callback(GPIO_Pin);
+		Btn_Callback(GPIO_Pin);
 	}
 }
 
