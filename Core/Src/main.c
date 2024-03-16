@@ -109,10 +109,10 @@ void  OS_SetupTask (void  *p_arg){
 
 	//init buttons and leds
 
-	Btn_Init(BTN0_GPIO_Port,BTN0_Pin,BUTTON_MODE_POL);
-	Btn_Init(BTN1_GPIO_Port,BTN1_Pin,BUTTON_MODE_POL);
-	Btn_Init(BTN2_GPIO_Port,BTN2_Pin,BUTTON_MODE_POL);
-	Btn_Init(BTN3_GPIO_Port,BTN3_Pin,BUTTON_MODE_POL);
+	Btn_Init(BTN0_GPIO_Port,BTN0_Pin,BUTTON_MODE_POL,"Btn0");
+	Btn_Init(BTN1_GPIO_Port,BTN1_Pin,BUTTON_MODE_POL,"Btn1");
+	Btn_Init(BTN2_GPIO_Port,BTN2_Pin,BUTTON_MODE_POL,"Btn2");
+	Btn_Init(BTN3_GPIO_Port,BTN3_Pin,BUTTON_MODE_POL,"Btn3");
 
 	//init display
 	Displ_Init(Displ_Orientat_0);
@@ -121,7 +121,7 @@ void  OS_SetupTask (void  *p_arg){
 	Led_Init();
 	return;
 	//OSTaskSuspend((OS_TCB *)0,&err);
-	//OSTaskDel((OS_TCB *)0,&err);
+//	OSTaskDel((OS_TCB *)0,&err);
 }
 
 void OS_Test2Task(void *p_arg) {
@@ -130,22 +130,13 @@ void OS_Test2Task(void *p_arg) {
 	while (1) {
 
 		if (Btn_getState(BTN3_GPIO_Port, BTN3_Pin) == GPIO_PIN_SET) {
-			antibalancing++;
-			if (antibalancing >= BALANCING_DELAY) {
 				countTask2 = (countTask2 * 2) + 1;
 				ledOut(countTask2);
-				antibalancing = 0;
-			}
 		}
 
 		if (Btn_getState(BTN0_GPIO_Port, BTN0_Pin) == GPIO_PIN_SET) {
-			antibalancing++;
-
-			if (antibalancing >= BALANCING_DELAY) {
 				countTask2 = (countTask2 / 2);
 				ledOut(countTask2);
-				antibalancing = 0;
-			}
 		}
 
 		//Displ_PerfTest();
@@ -155,15 +146,14 @@ void OS_Test2Task(void *p_arg) {
 }
 
 void OS_Test3Task(void *p_arg){
-//	OS_ERR err = OS_ERR_NONE;
 
-	static int x0 = 100;
-	static int y0 = 100;
+	OS_ERR err = OS_ERR_NONE;
+	static int r = 50;
 	while(1){
-
-		if(Displ_drawCircle(x0,y0, 100, RED) == 0){
-			x0 += 1;
-			y0 += 1;
+		//OSTimeDly(2,2,&err);
+		if(Displ_drawCircle(110, 150, r, RED) == 1)
+		{
+			r += 5;
 		}
 	}
 }

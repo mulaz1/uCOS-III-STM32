@@ -97,7 +97,7 @@ typedef enum {
 
 #define _swap_int16_t(a, b)  { int16_t t = a; a = b; b = t; }
 
-// da rivedere
+// TODO: works only drawCicle more or less
 #ifndef DISPLAY_USING_TOUCHGFX
 _Bool Displ_drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
 void Displ_fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
@@ -117,12 +117,15 @@ void Displ_Pixel(uint16_t x, uint16_t y, uint16_t color);
 void Displ_WChar(uint16_t x, uint16_t y, char ch, sFONT font, uint8_t size, uint16_t color, uint16_t bgcolor);
 void Displ_WString(uint16_t x, uint16_t y, const char* str, sFONT font, uint8_t size, uint16_t color, uint16_t bgcolor);
 #endif /* ! DISPLAY_USING_TOUCHGFX */
+
 void Displ_FillArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
 void Displ_Orientation(Displ_Orientat_e orientation);
 void Displ_Init(Displ_Orientat_e orientation);
 
-void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi);
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi);
+
+//TODO: Just decleareted for definition with interrupt but don't work
+//void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi);
+//void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi);
 
 uint32_t  Displ_BackLight(uint8_t cmd);
 
@@ -135,7 +138,6 @@ void touchgfxDisplayDriverTransmitBlock(const uint8_t* pixels, uint16_t x, uint1
 extern void DisplayDriver_TransferCompleteCallback();
 extern void touchgfxSignalVSync(void);
 #endif /* DISPLAY_USING_TOUCHGFX */
-
 
 
 

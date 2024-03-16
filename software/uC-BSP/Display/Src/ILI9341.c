@@ -6,6 +6,7 @@
  */
 
 #include "main.h"
+#include "../Inc/ILI9341.h"
 
 extern SPI_HandleTypeDef DISPL_SPI_PORT;
 
@@ -53,37 +54,36 @@ static uint8_t *dispBuffer = dispBuffer1;
 void Displ_Transmit(GPIO_PinState DC_Status, uint8_t *data, uint16_t dataSize,
 		uint8_t isTouchGFXBuffer) {
 
-	while (!Displ_SpiAvailable) {
-	}; // waiting for a free SPI port. Flag is set to 1 by transmission-complete interrupt callback
+	while (!Displ_SpiAvailable) {}; // waiting for a free SPI port. Flag is set to 1 by transmission-complete interrupt callback
 
 	//Displ_Select();
 	HAL_GPIO_WritePin(DISPL_DC_GPIO_Port, DISPL_DC_Pin, DC_Status);
 
-	if (isTouchGFXBuffer) {
-#ifdef Z_RGB565
-//if color format is RGB565 just swap even and odd bytes correcting endianess for ILI driver
-		uint32_t *limit = (uint32_t*) (data + dataSize);
-		for (uint32_t *data32 = (uint32_t*) data; data32 < limit; data32++) {
-			*data32 = __REV16(*data32);
-		}
-#else
-//if display color format is RGB666: convert RGB565 received by TouchGFX and swap bytes
-
-		uint8_t *buf8Pos=dispBuffer1; 							//using a local pointer
-
-		uint16_t *limit=(uint16_t*)(data+dataSize);
-		for (uint16_t *data16=(uint16_t*)data; (data16<limit) & ((buf8Pos-dispBuffer1)<(SIZEBUF-3)); data16++) {
-
-			*(buf8Pos++)=((*data16 & 0xF800)>>8);  // R color
-			*(buf8Pos++)=((*data16 & 0x07E0)>>3);  // G color
-			*(buf8Pos++)=((*data16 & 0x001F)<<3);  // B color
-		}
-
-		data=dispBuffer1; 				//data (pointer to data to transfer via SPI) has to point to converted buffer
-		dataSize=(buf8Pos-dispBuffer1);	//and dataSize has to contain the converted buffer size
-
-#endif //Z_RGB565
-	}
+//	if (isTouchGFXBuffer) {
+//#ifdef Z_RGB565
+////if color format is RGB565 just swap even and odd bytes correcting endianess for ILI driver
+//		uint32_t *limit = (uint32_t*) (data + dataSize);
+//		for (uint32_t *data32 = (uint32_t*) data; data32 < limit; data32++) {
+//			*data32 = __REV16(*data32);
+//		}
+//#else
+////if display color format is RGB666: convert RGB565 received by TouchGFX and swap bytes
+//
+//		uint8_t *buf8Pos=dispBuffer1; 							//using a local pointer
+//
+//		uint16_t *limit=(uint16_t*)(data+dataSize);
+//		for (uint16_t *data16=(uint16_t*)data; (data16<limit) & ((buf8Pos-dispBuffer1)<(SIZEBUF-3)); data16++) {
+//
+//			*(buf8Pos++)=((*data16 & 0xF800)>>8);  // R color
+//			*(buf8Pos++)=((*data16 & 0x07E0)>>3);  // G color
+//			*(buf8Pos++)=((*data16 & 0x001F)<<3);  // B color
+//		}
+//
+//		data=dispBuffer1; 				//data (pointer to data to transfer via SPI) has to point to converted buffer
+//		dataSize=(buf8Pos-dispBuffer1);	//and dataSize has to contain the converted buffer size
+//
+//#endif //Z_RGB565
+//	}
 
 #ifdef DISPLAY_SPI_INTERRUPT_MODE
 		Displ_SpiAvailable=0;
@@ -95,13 +95,13 @@ void Displ_Transmit(GPIO_PinState DC_Status, uint8_t *data, uint16_t dataSize,
 	Displ_SpiAvailable = 0;
 	HAL_SPI_Transmit(&DISPL_SPI_PORT, data, dataSize, 100); //HAL_MAX_DELAY);
 	Displ_SpiAvailable = 1;
-	/*  #ifdef DISPLAY_USING_TOUCHGFX
+
+#ifdef DISPLAY_USING_TOUCHGFX
 	 if (isTouchGFXBuffer){
 	 DisplayDriver_TransferCompleteCallback();
 	 }
 	 #endif //DISPLAY_USING_TOUCHGFX
 
-	 */
 #ifdef DISPLAY_SPI_DMA_MODE
 		} else {
 			Displ_SpiAvailable=0;
@@ -116,8 +116,7 @@ void Displ_WriteCommand(uint8_t cmd) {
 }
 
 void Displ_WriteData(uint8_t *buff, size_t buff_size, uint8_t isTouchGFXBuffer) {
-	if (buff_size == 0)
-		return;
+	if (buff_size == 0) return;
 	Displ_Transmit(SPI_DATA, buff, buff_size, isTouchGFXBuffer);
 }
 
@@ -210,24 +209,25 @@ void Displ_Orientation(Displ_Orientat_e orientation) {
 	current_orientation = orientation; //stores active orientation into a global variable for touch routines
 }
 
-void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
-	if (hspi->Instance == DISPL_SPI) {
-		Displ_SpiAvailable = 1;
-	}
-}
+//void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
+//	if (hspi->Instance == DISPL_SPI) {
+//		Displ_SpiAvailable = 1;
+//	}
+//}
+//
+////se si vuole usare touch gxf
+//
+//void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
+//	if (hspi->Instance == DISPL_SPI) {
+//		Displ_SpiAvailable = 1;
+//		/*
+//		 #ifdef DISPLAY_USING_TOUCHGFX
+//		 DisplayDriver_TransferCompleteCallback();
+//		 #endif
+//		 */
+//	}
+//}
 
-//se si vuole usare touch gxf
-
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
-	if (hspi->Instance == DISPL_SPI) {
-		Displ_SpiAvailable = 1;
-		/*
-		 #ifdef DISPLAY_USING_TOUCHGFX
-		 DisplayDriver_TransferCompleteCallback();
-		 #endif
-		 */
-	}
-}
 
 void Displ_FillArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
 		uint16_t color) {

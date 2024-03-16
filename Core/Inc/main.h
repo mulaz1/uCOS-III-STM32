@@ -37,8 +37,6 @@ extern "C" {
 #include "uC-BSP/Display/Inc/ILI9341.h"
 #include "uC-BSP/Display/Inc/ILI9341_test.h"
 #include "uC-BSP/Display/Inc/XPT2046.h"
-#include "uC-BSP/Display/Inc/XPT2046_test.h"
-#include "uC-BSP/Display/Inc/XPT2046_menu.h"
 
 
 //LEDs and BUTTONs

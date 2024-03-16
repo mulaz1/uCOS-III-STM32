@@ -174,13 +174,13 @@ void PendSV_Handler(void)
   /* USER CODE BEGIN PendSV_IRQn 0 */
   /* USER CODE END PendSV_IRQn 0 */
   /* USER CODE BEGIN PendSV_IRQn 1 */
-	COM_port_serial_print((const uint8_t *)"Entry PendSV:");
-	COM_port_serial_print((const uint8_t *)OSTCBCurPtr->NamePtr);
-	COM_port_serial_print((const uint8_t *)"\r\n");
+//	COM_port_serial_print((const uint8_t *)"Entry PendSV:");
+//	COM_port_serial_print((const uint8_t *)OSTCBCurPtr->NamePtr);
+//	COM_port_serial_print((const uint8_t *)"\r\n");
 	OS_CPU_PendSVHandler();
-	COM_port_serial_print((const uint8_t *)"Exit PendSV: ");
-	COM_port_serial_print((const uint8_t *)OSTCBCurPtr->NamePtr);
-	COM_port_serial_print((const uint8_t *)"\r\n");
+//	COM_port_serial_print((const uint8_t *)"Exit PendSV: ");
+//	COM_port_serial_print((const uint8_t *)OSTCBCurPtr->NamePtr);
+//	COM_port_serial_print((const uint8_t *)"\r\n");
 
   /* USER CODE END PendSV_IRQn 1 */
 }
