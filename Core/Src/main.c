@@ -41,6 +41,7 @@ unsigned int countTask3 = 0;
 uint16_t antibalancing = 0;
 uint16_t color[6] = {0x001F,0x07E0,0xFD00,0xC018,0x8000,0x0010};
 uint16_t i = 0;
+uint16_t n = 0;
 //color test
 
 /* USER CODE END PM */
@@ -50,7 +51,6 @@ I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
-DMA_HandleTypeDef hdma_spi1_tx;
 
 TIM_HandleTypeDef htim10;
 
@@ -67,7 +67,6 @@ HAL_StatusTypeDef COM_port_serial_print(const uint8_t* data) {
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_USART3_UART_Init(void);
@@ -116,7 +115,7 @@ void  OS_SetupTask (void  *p_arg){
 
 	//init display
 	Displ_Init(Displ_Orientat_0);
-	Displ_CLS(WHITE);
+	Displ_CLS(RED);
 	//init Leds
 	Led_Init();
 	return;
@@ -142,6 +141,7 @@ void OS_Test2Task(void *p_arg) {
 		//Displ_PerfTest();
 		//Touch_ShowData();
 		//Touch_TestDrawing();
+		n = 0;
 	}
 }
 
@@ -149,11 +149,14 @@ void OS_Test3Task(void *p_arg){
 
 	OS_ERR err = OS_ERR_NONE;
 	static int r = 50;
-	while(1){
+while(1){
+	//Displ_CLS(WHITE);
 		//OSTimeDly(2,2,&err);
-		if(Displ_drawCircle(110, 150, r, RED) == 1)
-		{
+	if(n < 1){
+		Displ_drawCircle(120, 160, r, WHITE);
+		if(r > 65000) r = 50;
 			r += 5;
+			n++;
 		}
 	}
 }
@@ -187,7 +190,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_I2C1_Init();
   MX_SPI2_Init();
   MX_USART3_UART_Init();
@@ -258,6 +260,9 @@ int main(void)
                          (void       *)0u,
                          (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
                          (OS_ERR     *)p_err3);
+
+
+  	//HAL_DMA_Init(&hdma_spi1_tx);
 
 	OSStart(&err);
   /* USER CODE END 2 */
@@ -523,22 +528,6 @@ static void MX_USART3_UART_Init(void)
   /* USER CODE BEGIN USART3_Init 2 */
 
   /* USER CODE END USART3_Init 2 */
-
-}
-
-/**
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void)
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA2_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA2_Stream3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 
 }
 

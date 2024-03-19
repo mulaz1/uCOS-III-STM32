@@ -54,10 +54,10 @@ static uint8_t *dispBuffer = dispBuffer1;
 void Displ_Transmit(GPIO_PinState DC_Status, uint8_t *data, uint16_t dataSize,
 		uint8_t isTouchGFXBuffer) {
 
-	while (!Displ_SpiAvailable) {}; // waiting for a free SPI port. Flag is set to 1 by transmission-complete interrupt callback
+	//while (!Displ_SpiAvailable) {}; // waiting for a free SPI port. Flag is set to 1 by transmission-complete interrupt callback
 
 	//Displ_Select();
-	HAL_GPIO_WritePin(DISPL_DC_GPIO_Port, DISPL_DC_Pin, DC_Status);
+	//HAL_GPIO_WritePin(DISPL_DC_GPIO_Port, DISPL_DC_Pin, DC_Status);
 
 //	if (isTouchGFXBuffer) {
 //#ifdef Z_RGB565
@@ -85,30 +85,43 @@ void Displ_Transmit(GPIO_PinState DC_Status, uint8_t *data, uint16_t dataSize,
 //#endif //Z_RGB565
 //	}
 
-#ifdef DISPLAY_SPI_INTERRUPT_MODE
-		Displ_SpiAvailable=0;
-		HAL_SPI_Transmit_IT(&DISPL_SPI_PORT , data, dataSize);
-#else
-#ifdef DISPLAY_SPI_DMA_MODE
-		if (dataSize<DISPL_DMA_CUTOFF) {
-#endif //DISPLAY_SPI_DMA_MODE
-	Displ_SpiAvailable = 0;
-	HAL_SPI_Transmit(&DISPL_SPI_PORT, data, dataSize, 100); //HAL_MAX_DELAY);
-	Displ_SpiAvailable = 1;
+//#ifdef DISPLAY_SPI_INTERRUPT_MODE
+//		Displ_SpiAvailable=0;
+//		HAL_SPI_Transmit_IT(&DISPL_SPI_PORT , data, dataSize);
+//#else
+//#ifdef DISPLAY_SPI_DMA_MODE
 
-#ifdef DISPLAY_USING_TOUCHGFX
-	 if (isTouchGFXBuffer){
-	 DisplayDriver_TransferCompleteCallback();
-	 }
-	 #endif //DISPLAY_USING_TOUCHGFX
+	if(dataSize > 0){
+		Displ_SpiAvailable = 0;
+		//HAL_GPIO_WritePin(DISPL_CS_GPIO_Port, DISPL_CS_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(DISPL_DC_GPIO_Port, DISPL_DC_Pin, DC_Status);
+		HAL_SPI_Transmit_IT(&DISPL_SPI_PORT, data, dataSize); //HAL_MAX_DELAY);
+	}
+	else{
+		hspi1.pTxBuffPtr = 0;
+	}
+//		HAL_SPI_Transmit_DMA(&DISPL_SPI_PORT , data, dataSize);
 
-#ifdef DISPLAY_SPI_DMA_MODE
-		} else {
-			Displ_SpiAvailable=0;
-			HAL_SPI_Transmit_DMA(&DISPL_SPI_PORT , data, dataSize);
-		}
-#endif //DISPLAY_SPI_DMA_MODE
-#endif //DISPLAY_SPI_INTERRUPT_MODE
+//		if (dataSize<DISPL_DMA_CUTOFF) {
+//#endif //DISPLAY_SPI_DMA_MODE
+////	Displ_SpiAvailable = 0;
+//	//HAL_SPI_Transmit(&DISPL_SPI_PORT, data, dataSize, 100); //HAL_MAX_DELAY);
+//	Displ_SpiAvailable = 1;
+//
+//#ifdef DISPLAY_USING_TOUCHGFX
+//	 if (isTouchGFXBuffer){
+//	 DisplayDriver_TransferCompleteCallback();
+//	 }
+//	 #endif //DISPLAY_USING_TOUCHGFX
+//
+//#ifdef DISPLAY_SPI_DMA_MODE
+//		} else {
+//			Displ_SpiAvailable=0;
+//			HAL_SPI_Transmit_DMA(&DISPL_SPI_PORT , data, dataSize);
+//		}
+//#endif //DISPLAY_SPI_DMA_MODE
+//#endif //DISPLAY_SPI_INTERRUPT_MODE
+//}
 }
 
 void Displ_WriteCommand(uint8_t cmd) {
@@ -170,17 +183,16 @@ void Displ_Init(Displ_Orientat_e orientation) {
 		HAL_GPIO_WritePin(TOUCH_CS_GPIO_Port, TOUCH_CS_Pin, GPIO_PIN_SET);// unselect touch (will be selected at writing time)
 	} else {				// otherwise leave both port permanently selected
 		HAL_GPIO_WritePin(DISPL_CS_GPIO_Port, DISPL_CS_Pin, GPIO_PIN_RESET); // select display
-		SET_DISPL_SPI_BAUDRATE
-		;
+		SET_DISPL_SPI_BAUDRATE;
 		HAL_GPIO_WritePin(TOUCH_CS_GPIO_Port, TOUCH_CS_Pin, GPIO_PIN_RESET);// select touch
-		SET_TOUCH_SPI_BAUDRATE
-		;
+		SET_TOUCH_SPI_BAUDRATE;
 	}
 	ILI9341_Init();
 	Displ_Orientation(orientation);
 }
 
 void Displ_Orientation(Displ_Orientat_e orientation) {
+
 	static uint8_t data[1];
 	switch (orientation) {
 	case Displ_Orientat_0:
@@ -209,24 +221,25 @@ void Displ_Orientation(Displ_Orientat_e orientation) {
 	current_orientation = orientation; //stores active orientation into a global variable for touch routines
 }
 
-//void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
-//	if (hspi->Instance == DISPL_SPI) {
-//		Displ_SpiAvailable = 1;
-//	}
-//}
+void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
+	if (hspi->Instance == DISPL_SPI) {
+		//Displ_SpiAvailable = 1;
+	}
+}
 //
 ////se si vuole usare touch gxf
 //
-//void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
-//	if (hspi->Instance == DISPL_SPI) {
-//		Displ_SpiAvailable = 1;
-//		/*
-//		 #ifdef DISPLAY_USING_TOUCHGFX
-//		 DisplayDriver_TransferCompleteCallback();
-//		 #endif
-//		 */
-//	}
-//}
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
+	if (hspi->Instance == DISPL_SPI) {
+		//HAL_GPIO_WritePin(DISPL_CS_GPIO_Port, DISPL_CS_Pin, GPIO_PIN_SET);
+		Displ_SpiAvailable = 1;
+		/*
+		 #ifdef DISPLAY_USING_TOUCHGFX
+		 DisplayDriver_TransferCompleteCallback();
+		 #endif
+		 */
+	}
+}
 
 
 void Displ_FillArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
@@ -292,10 +305,10 @@ void Displ_Pixel(uint16_t x, uint16_t y, uint16_t color) {
 
 _Bool Displ_drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color) {
 
-	static _Bool active = 0;
-
-	if(active == 1) return 1;
-	else active = !active;
+//	static _Bool active = 0;
+//
+//	if(active == 1) return 1;
+//	else active = !active;
 
 	int16_t f = 1 - r;
 	int16_t ddF_x = 1;
@@ -303,7 +316,7 @@ _Bool Displ_drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color) {
 	int16_t x = 0;
 	int16_t y = r;
 
-//    writePixel(x0  , y0+r, color);
+	//writePixel(x0  , y0+r, color);
 	Displ_Pixel(x0, y0 + r, color);
 	Displ_Pixel(x0, y0 - r, color);
 	Displ_Pixel(x0 + r, y0, color);
@@ -329,7 +342,8 @@ _Bool Displ_drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color) {
 		Displ_Pixel(x0 - y, y0 - x, color);
 	}
 
-	return active = 0;
+	//return active = 0;
+	return 0;
 }
 
 /*****************
