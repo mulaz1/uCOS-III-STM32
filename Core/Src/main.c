@@ -149,13 +149,21 @@ void OS_Test3Task(void *p_arg){
 
 	OS_ERR err = OS_ERR_NONE;
 	static int r = 50;
-while(1){
-	//Displ_CLS(WHITE);
+	static _Bool upCount = 1;
+	while (1) {
+		//Displ_CLS(WHITE);
 		//OSTimeDly(2,2,&err);
-	if(n < 1){
-		Displ_drawCircle(120, 160, r, WHITE);
-		if(r > 65000) r = 50;
-			r += 5;
+		if (n < 1) {
+			if(r >= 65000) r = 50;
+			if ((r >= 200) || (r < 50)) upCount = !upCount;
+			if(upCount){
+				Displ_drawCircle(120, 160, r, WHITE);
+				r += 5;
+			}
+			else{
+				Displ_drawCircle(120, 160, r, RED);
+				r -= 5;
+			}
 			n++;
 		}
 	}
