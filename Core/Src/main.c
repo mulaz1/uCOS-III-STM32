@@ -89,25 +89,10 @@ CPU_STK_SIZE OSCfg_Test3StkBasePtr[2048];
 
 void  OS_SetupTask (void  *p_arg){
 
-	CPU_Init();
-	OS_ERR err = OS_ERR_NONE;
-	SystemInit();
-	SystemCoreClockUpdate();
-
-	SysTick_Config(SystemCoreClock/160);
-	SysTick -> CTRL = 0;
-	SysTick -> VAL = 0;
-	SysTick -> CTRL = (SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_CLKSOURCE_Msk);
-
-//	OS_TickInit(&err);	/* This function must not be called explicitly. In addition, it is already called by OSInit() */
-
+  	OS_ERR err = OS_ERR_NONE;
 	OS_CPU_SysTickInitFreq(SystemCoreClock);
 
-	COM_port_serial_print((const uint8_t*)"START_TASK\r\n");
-
-
 	//init buttons and leds
-
 	Btn_Init(BTN0_GPIO_Port,BTN0_Pin,BUTTON_MODE_POL,"Btn0");
 	Btn_Init(BTN1_GPIO_Port,BTN1_Pin,BUTTON_MODE_POL,"Btn1");
 	Btn_Init(BTN2_GPIO_Port,BTN2_Pin,BUTTON_MODE_POL,"Btn2");
@@ -116,11 +101,12 @@ void  OS_SetupTask (void  *p_arg){
 	//init display
 	Displ_Init(Displ_Orientat_0);
 	Displ_CLS(RED);
+
 	//init Leds
 	Led_Init();
-	return;
-	//OSTaskSuspend((OS_TCB *)0,&err);
-//	OSTaskDel((OS_TCB *)0,&err);
+
+	//del
+	OSTaskDel((OS_TCB *)0,&err);
 }
 
 void OS_Test2Task(void *p_arg) {
@@ -137,10 +123,6 @@ void OS_Test2Task(void *p_arg) {
 				countTask2 = (countTask2 / 2);
 				ledOut(countTask2);
 		}
-
-		//Displ_PerfTest();
-		//Touch_ShowData();
-		//Touch_TestDrawing();
 		n = 0;
 	}
 }
@@ -186,14 +168,13 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  //SystemInit();
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -269,9 +250,7 @@ int main(void)
                          (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
                          (OS_ERR     *)p_err3);
 
-
-  	//HAL_DMA_Init(&hdma_spi1_tx);
-
+    CPU_Init();
 	OSStart(&err);
   /* USER CODE END 2 */
 
