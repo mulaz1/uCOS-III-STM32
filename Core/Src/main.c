@@ -109,7 +109,7 @@ void  OS_SetupTask (void  *p_arg){
 	OSTaskDel((OS_TCB *)0,&err);
 }
 
-void OS_Test2Task(void *p_arg) {
+void OS_Test2Task(void *p_arg){
 //	OS_ERR err = OS_ERR_NONE;
 
 	while (1) {
@@ -133,8 +133,6 @@ void OS_Test3Task(void *p_arg){
 	static int r = 50;
 	static _Bool upCount = 1;
 	while (1) {
-		//Displ_CLS(WHITE);
-		//OSTimeDly(2,2,&err);
 		if (n < 1) {
 			if(r >= 65000) r = 50;
 			if ((r >= 200) || (r < 50)) upCount = !upCount;
