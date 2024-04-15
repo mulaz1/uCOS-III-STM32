@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * @file           : main.c
- * @brief          : Main program body
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2023 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2024 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -36,12 +36,9 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-uint8_t countTask2 = 0;
-unsigned int countTask3 = 0;
-uint16_t antibalancing = 0;
 uint16_t color[6] = {0x001F,0x07E0,0xFD00,0xC018,0x8000,0x0010};
-uint16_t i = 0;
 uint16_t n = 0;
+uint8_t countTask2 = 0;
 //color test
 
 /* USER CODE END PM */
@@ -51,14 +48,13 @@ I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
+DMA_HandleTypeDef hdma_spi1_tx;
 
 TIM_HandleTypeDef htim10;
 
 UART_HandleTypeDef huart2;
-UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-
 HAL_StatusTypeDef COM_port_serial_print(const uint8_t* data) {
     return HAL_UART_Transmit(&huart2, data, strlen((const char *)data) + 1, 100);
 }
@@ -67,9 +63,9 @@ HAL_StatusTypeDef COM_port_serial_print(const uint8_t* data) {
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI2_Init(void);
-static void MX_USART3_UART_Init(void);
 static void MX_TIM10_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_SPI1_Init(void);
@@ -79,35 +75,59 @@ static void MX_SPI1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-OS_TCB OSSetupTaskTcb;
 OS_TCB OSTest2TaskTcb;
 OS_TCB OSTest3TaskTcb;
 
-CPU_STK_SIZE OSCfg_SetupStkBasePtr[512];
 CPU_STK_SIZE OSCfg_Test2StkBasePtr[2048];
 CPU_STK_SIZE OSCfg_Test3StkBasePtr[2048];
 
-void  OS_SetupTask (void  *p_arg){
 
-  	OS_ERR err = OS_ERR_NONE;
-	OS_CPU_SysTickInitFreq(SystemCoreClock);
+//XXX DEMO 2
 
-	//init buttons and leds
-	Btn_Init(BTN0_GPIO_Port,BTN0_Pin,BUTTON_MODE_POL,"Btn0");
-	Btn_Init(BTN1_GPIO_Port,BTN1_Pin,BUTTON_MODE_POL,"Btn1");
-	Btn_Init(BTN2_GPIO_Port,BTN2_Pin,BUTTON_MODE_POL,"Btn2");
-	Btn_Init(BTN3_GPIO_Port,BTN3_Pin,BUTTON_MODE_POL,"Btn3");
-
-	//init display
-	Displ_Init(Displ_Orientat_0);
-	Displ_CLS(RED);
-
-	//init Leds
-	Led_Init();
-
-	//del
-	OSTaskDel((OS_TCB *)0,&err);
-}
+//void OS_Test2Task(void *p_arg) {
+//
+//	OS_ERR err = OS_ERR_NONE;
+//
+//	while(1){
+//
+//		BSP_LED_Toggle(2);
+//
+//		for (int i = 0; i < 5000000; i++);
+//
+//		n = 0;
+//
+//		BSP_LED_Toggle(2);
+//
+//		for (int i = 0; i < 5000000; i++);
+//
+//		n = 0;
+//	}
+//}
+//
+//void OS_Test3Task(void *p_arg){
+//
+//
+//	OS_ERR err = OS_ERR_NONE;
+//	static int r = 50;
+//	static _Bool upCount = 1;
+//	while (1) {
+//		//Displ_CLS(WHITE);
+//		//OSTimeDly(2,2,&err);
+//		if (n < 1) {
+//			if(r >= 65000) r = 50;
+//			if ((r >= 200) || (r < 50)) upCount = !upCount;
+//			if(upCount){
+//				Displ_drawCircle(120, 160, r, WHITE);
+//				r += 5;
+//			}
+//			else{
+//				Displ_drawCircle(120, 160, r, RED);
+//				r -= 5;
+//			}
+//			n++;
+//		}
+//	}
+//}
 
 void OS_Test2Task(void *p_arg){
 //	OS_ERR err = OS_ERR_NONE;
@@ -166,36 +186,33 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  //SystemInit();
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   MX_SPI2_Init();
-  MX_USART3_UART_Init();
   MX_TIM10_Init();
   MX_USART2_UART_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
-  SysTick->CTRL  = 0;
-
   __disable_irq();
   CPU_IntDis(); 					/*disable interrupt*/
+  CPU_Init();
   OSInit(&err);
 
   if(err != OS_ERR_NONE){
 	  Error_Handler();
   }
-
-  OS_ERR p_err = OS_ERR_NONE;
 
   OS_ERR p_err2 = OS_ERR_NONE;
 
@@ -203,21 +220,7 @@ int main(void)
 
   OS_ERR err_rr_en = OS_ERR_NONE;
 
-  OSSchedRoundRobinCfg(1,0,&err_rr_en);
-
-  OSTaskCreate((OS_TCB     *)&OSSetupTaskTcb,
-                     (CPU_CHAR   *)((void *)"uC/OS-III Setup Task"),
-                     (OS_TASK_PTR)OS_SetupTask,
-                     (void       *)0,
-                     (OS_PRIO     )8u,
-                     (CPU_STK    *)&OSCfg_SetupStkBasePtr[0],
-                     (CPU_STK_SIZE)512u / 10,
-                     (CPU_STK_SIZE)512u,
-                     (OS_MSG_QTY  )0u,
-                     (OS_TICK     )0u,
-                     (void       *)0u,
-                     (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
-                     (OS_ERR     *)p_err);
+  OSSchedRoundRobinCfg(1, 0, &err_rr_en);
 
   OSTaskCreate((OS_TCB     *)&OSTest2TaskTcb,
                        (CPU_CHAR   *)((void *)"uC/OS-III Test 2 Task"),
@@ -248,7 +251,17 @@ int main(void)
                          (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
                          (OS_ERR     *)p_err3);
 
-    CPU_Init();
+  	Btn_Init(BTN0_GPIO_Port,BTN0_Pin,BUTTON_MODE_POL,"Btn0");
+  	Btn_Init(BTN1_GPIO_Port,BTN1_Pin,BUTTON_MODE_POL,"Btn1");
+  	Btn_Init(BTN2_GPIO_Port,BTN2_Pin,BUTTON_MODE_POL,"Btn2");
+  	Btn_Init(BTN3_GPIO_Port,BTN3_Pin,BUTTON_MODE_POL,"Btn3");
+
+  	//init display
+  	Displ_Init(Displ_Orientat_0);
+  	Displ_CLS(RED);
+  	//init Leds
+  	Led_Init();
+
 	OSStart(&err);
   /* USER CODE END 2 */
 
@@ -484,35 +497,18 @@ static void MX_USART2_UART_Init(void)
 }
 
 /**
-  * @brief USART3 Initialization Function
-  * @param None
-  * @retval None
+  * Enable DMA controller clock
   */
-static void MX_USART3_UART_Init(void)
+static void MX_DMA_Init(void)
 {
 
-  /* USER CODE BEGIN USART3_Init 0 */
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
 
-  /* USER CODE END USART3_Init 0 */
-
-  /* USER CODE BEGIN USART3_Init 1 */
-
-  /* USER CODE END USART3_Init 1 */
-  huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
-  huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
-  huart3.Init.Parity = UART_PARITY_NONE;
-  huart3.Init.Mode = UART_MODE_TX_RX;
-  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART3_Init 2 */
-
-  /* USER CODE END USART3_Init 2 */
+  /* DMA interrupt init */
+  /* DMA2_Stream3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 
 }
 
@@ -614,28 +610,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  //se premo il pulsante:
-	//che il pin premuto sia valido
-	//faccio qualcosa
-	//tipo bestemmiare
-
-	if (GPIO_Pin == TOUCH_INT_Pin){
-		Touch_HandlePenDownInterrupt();
-	}
-	else{
-		Btn_Callback(GPIO_Pin);
-	}
-}
-
-//void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
-//	HAL_GPIO_EXTI_Callback(GPIO_Pin);
-//}
-//
-//void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
-//	HAL_GPIO_EXTI_Callback(GPIO_Pin);
-//}
 
 /* USER CODE END 4 */
 
@@ -646,10 +620,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-	/* User can add his own implementation to report the HAL error return state */
-	__disable_irq();
-	while (1) {
-	}
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
   /* USER CODE END Error_Handler_Debug */
 }
 
