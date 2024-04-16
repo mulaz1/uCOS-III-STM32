@@ -55,7 +55,7 @@ extern OS_TCB* OSTCBCurPtr;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-
+extern SPI_HandleTypeDef hspi1;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -84,7 +84,8 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
-	COM_port_serial_print("HardFault\r\n");
+	COM_port_serial_print((const uint8_t *)"HardFault\r\n");
+	//NVIC_SystemReset();
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
   {
@@ -173,13 +174,13 @@ void PendSV_Handler(void)
   /* USER CODE BEGIN PendSV_IRQn 0 */
   /* USER CODE END PendSV_IRQn 0 */
   /* USER CODE BEGIN PendSV_IRQn 1 */
-	COM_port_serial_print("Entry PeneSV:");
-	COM_port_serial_print(OSTCBCurPtr->NamePtr);
-	COM_port_serial_print("\r\n");
+//	COM_port_serial_print((const uint8_t *)"Entry PendSV:");
+//	COM_port_serial_print((const uint8_t *)OSTCBCurPtr->NamePtr);
+//	COM_port_serial_print((const uint8_t *)"\r\n");
 	OS_CPU_PendSVHandler();
-	COM_port_serial_print("Exit PeneSV: ");
-	COM_port_serial_print(OSTCBCurPtr->NamePtr);
-	COM_port_serial_print("\r\n");
+//	COM_port_serial_print((const uint8_t *)"Exit PendSV: ");
+//	COM_port_serial_print((const uint8_t *)OSTCBCurPtr->NamePtr);
+//	COM_port_serial_print((const uint8_t *)"\r\n");
 
   /* USER CODE END PendSV_IRQn 1 */
 }
@@ -194,6 +195,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
+  /* FIXME why when commenting HAL_IncTick() we get to an HardFault */
   OS_CPU_SysTickHandler();
   /* USER CODE END SysTick_IRQn 1 */
 }
@@ -204,6 +206,77 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles RCC global interrupt.
+  */
+void RCC_IRQHandler(void)
+{
+  /* USER CODE BEGIN RCC_IRQn 0 */
+
+  /* USER CODE END RCC_IRQn 0 */
+  /* USER CODE BEGIN RCC_IRQn 1 */
+
+  /* USER CODE END RCC_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line 3 interrupt.
+  */
+void EXTI3_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI3_IRQn 0 */
+
+  /* USER CODE END EXTI3_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(TOUCH_INT_Pin);
+  /* USER CODE BEGIN EXTI3_IRQn 1 */
+
+  /* USER CODE END EXTI3_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line[9:5] interrupts.
+  */
+void EXTI9_5_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI9_5_IRQn 0 */
+  //ADD callback function
+  /* USER CODE END EXTI9_5_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(BTN3_Pin);
+  /* USER CODE BEGIN EXTI9_5_IRQn 1 */
+
+  /* USER CODE END EXTI9_5_IRQn 1 */
+}
+
+/**
+  * @brief This function handles SPI1 global interrupt.
+  */
+void SPI1_IRQHandler(void)
+{
+  /* USER CODE BEGIN SPI1_IRQn 0 */
+
+  /* USER CODE END SPI1_IRQn 0 */
+  HAL_SPI_IRQHandler(&hspi1);
+  /* USER CODE BEGIN SPI1_IRQn 1 */
+
+  /* USER CODE END SPI1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line[15:10] interrupts.
+  */
+void EXTI15_10_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+
+  /* USER CODE END EXTI15_10_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(BTN2_Pin);
+  HAL_GPIO_EXTI_IRQHandler(BTN1_Pin);
+  HAL_GPIO_EXTI_IRQHandler(BTN0_Pin);
+  /* USER CODE BEGIN EXTI15_10_IRQn 1 */
+
+  /* USER CODE END EXTI15_10_IRQn 1 */
+}
 
 /* USER CODE BEGIN 1 */
 
